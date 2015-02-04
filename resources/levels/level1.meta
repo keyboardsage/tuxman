@@ -1,0 +1,7 @@
+lives = 3
+tile_size = 16
+bonus_type = cherry
+bonus_times = 11 48
+tuxman_position = 687
+map_width = 28
+map_height = 31

@@ -1,0 +1,41 @@
+Rough Draft (Pre-alpha):
+Render score, lives, and bonus type on screen
+Implement enemy movement
+Implement Tuxman/Enemy collision (Tuxman dies if touched)
+Make big food blink
+Make big food disappear (accumulate score)
+Make big food cause enemies to temporary stun if eaten
+Spawn Bonus types
+Add sound effects
+Add images
+Implement highscore (goes to this instead of transition at level end)
+Create main GUI (Play, Options(undone), Highscore, Help, Quit)
+Package main.cpp functionality into namespace or class
+Config(stores user/level config) object has default config & loads diffs
+Buildable & Installable with Automake
+
+Rough Draft 2 (Pre-alpha):
+2nd level
+Transitions between levels
+Use astyler/cpp beautifier
+Buildable & Installable with Scons
+Put documentation into repo (use cases etc.)
+
+Refinement (Alpha):
+Make configuration files use Boost Serialization and save in xml
+Boost Program Options for commandline options
+Man page (ensure option for debug mode in colors, comes in useful)
+More levels/art
+
+Refinement 2 (Alpha):
+Unit testing
+Check for memory leaks w/ valgrind & new/delete keyword overloading
+
+More Refinement (Beta):
+Joystick support with SDL
+
+Possible Improvement:
+Boost Python for embeddable python algorithms for enemies
+Random level generation play option
+Boost ASIO or SDL_Net for networking
+Able to record games

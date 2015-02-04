@@ -1,0 +1,174 @@
+# depslib dependency file v1.0
+1268309472 source:/home/malachi/Documents/Projects/tuxman/main.cpp
+	<iostream>
+	<stdexcept>
+	<SDL/SDL.h>
+	"OpenGL.hpp"
+
+1253575053 /home/malachi/Documents/Projects/tuxman/OpenGL.hpp
+	<windows.h>
+	<GL/gl.h>
+	<GL/glut.h>
+	<GL/gl.h>
+	<GL/glut.h>
+
+1268499426 source:/home/malachi/Documents/Projects/tuxman/src/main.cpp
+	<iostream>
+	<stdexcept>
+	<SDL/SDL.h>
+	"OpenGL.hpp"
+	"Level.hpp"
+	"GraphicStreamOut.hpp"
+	"DisplayInfo.hpp"
+	"Configuration.hpp"
+
+1253575053 /home/malachi/Documents/Projects/tuxman/src/OpenGL.hpp
+	<windows.h>
+	<GL/gl.h>
+	<GL/glut.h>
+	<GL/gl.h>
+	<GL/glut.h>
+
+1268498470 source:/home/malachi/Documents/Projects/tuxman/src/GraphicStreamOut.cpp
+	<iostream>
+	<GL/gl.h>
+	"GraphicStreamOut.hpp"
+
+1268498394 /home/malachi/Documents/Projects/tuxman/src/GraphicStreamOut.hpp
+	<string>
+	<vector>
+	<map>
+	<SDL/SDL.h>
+	<GL/gl.h>
+	"NotCopyable.hpp"
+	"ScreenObject.hpp"
+
+1268401762 /home/malachi/Documents/Projects/tuxman/src/NotCopyable.hpp
+
+1268497591 /home/malachi/Documents/Projects/tuxman/src/ScreenObject.hpp
+	"OpenGL.hpp"
+
+1268502454 source:/home/malachi/Documents/Projects/tuxman/src/Level.cpp
+	<iostream>
+	<cstdlib>
+	<fstream>
+	<string>
+	"Level.hpp"
+	"Tile.hpp"
+	"DisplayInfo.hpp"
+	"Configuration.hpp"
+	"GraphicStreamOut.hpp"
+
+1268491668 /home/malachi/Documents/Projects/tuxman/src/Level.hpp
+
+1268498482 /home/malachi/Documents/Projects/tuxman/src/Tile.hpp
+	"ScreenObject.hpp"
+
+1268482681 /home/malachi/Documents/Projects/tuxman/src/DisplayInfo.hpp
+
+1268482703 /home/malachi/Documents/Projects/tuxman/src/Configuration.hpp
+
+1288251747 source:/home/malachi/Projects/tuxman/src/GraphicStreamOut.cpp
+	<iostream>
+	<GL/gl.h>
+	"GraphicStreamOut.hpp"
+
+1288251594 /home/malachi/Projects/tuxman/src/GraphicStreamOut.hpp
+	<string>
+	<vector>
+	<map>
+	<SDL/SDL.h>
+	<GL/gl.h>
+	"NotCopyable.hpp"
+	"ScreenObject.hpp"
+
+1285827549 /home/malachi/Projects/tuxman/src/NotCopyable.hpp
+
+1287404370 /home/malachi/Projects/tuxman/src/ScreenObject.hpp
+	"OpenGL.hpp"
+	<map>
+
+1285827549 /home/malachi/Projects/tuxman/src/OpenGL.hpp
+	<windows.h>
+	<GL/gl.h>
+	<GL/glut.h>
+	<GL/gl.h>
+	<GL/glut.h>
+
+1288258678 source:/home/malachi/Projects/tuxman/src/Level.cpp
+	<iostream>
+	<cstdlib>
+	<fstream>
+	<string>
+	<sstream>
+	"Level.hpp"
+	"Tile.hpp"
+	"DisplayInfo.hpp"
+	"Configuration.hpp"
+	"GraphicStreamOut.hpp"
+	"ScreenObject.hpp"
+
+1288257767 /home/malachi/Projects/tuxman/src/Level.hpp
+	<fstream>
+	"Tile.hpp"
+
+1288258190 /home/malachi/Projects/tuxman/src/Tile.hpp
+	"ScreenObject.hpp"
+	"GraphicStreamOut.hpp"
+
+1285827549 /home/malachi/Projects/tuxman/src/DisplayInfo.hpp
+
+1287404370 /home/malachi/Projects/tuxman/src/Configuration.hpp
+	<string>
+	<vector>
+
+1287404370 source:/home/malachi/Projects/tuxman/src/main.cpp
+	<iostream>
+	<stdexcept>
+	<memory>
+	<SDL/SDL.h>
+	"OpenGL.hpp"
+	"DisplayInfo.hpp"
+	"Configuration.hpp"
+	"GameLoop.hpp"
+
+1287404370 source:/home/malachi/Projects/tuxman/src/FramesPerSecond.cpp
+	"FramesPerSecond.hpp"
+	<SDL/SDL.h>
+	<iostream>
+
+1287404370 /home/malachi/Projects/tuxman/src/FramesPerSecond.hpp
+	<iostream>
+	<SDL/SDL.h>
+
+1285874158 /home/malachi/Projects/tuxman/src/Singleton.hpp
+
+1288342979 source:/home/malachi/Projects/tuxman/src/Tuxman.cpp
+	"Tuxman.hpp"
+	"GraphicStreamOut.hpp"
+
+1287404370 /home/malachi/Projects/tuxman/src/Tuxman.hpp
+	"ScreenObject.hpp"
+
+1288345074 /home/malachi/Projects/tuxman/src/GameLoop.hpp
+	<SDL/SDL.h>
+	"Level.hpp"
+	"FramesPerSecond.hpp"
+	"Tuxman.hpp"
+	"Enemy.hpp"
+
+1288345392 source:/home/malachi/Projects/tuxman/src/GameLoop.cpp
+	"GameLoop.hpp"
+	"GraphicStreamOut.hpp"
+	"DisplayInfo.hpp"
+	"Configuration.hpp"
+	<iostream>
+	<cmath>
+
+1288344902 source:/home/malachi/Projects/tuxman/src/Enemy.cpp
+	"Enemy.hpp"
+	"GraphicStreamOut.hpp"
+
+1288344831 /home/malachi/Projects/tuxman/src/Enemy.hpp
+	"ScreenObject.hpp"
+

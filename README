@@ -1,0 +1,50 @@
+/***************************************************************************
+ *   Copyright Pending (C) 2010 by Alwyn Malachi Berkeley Jr.              *
+ *   malachix@users.sourceforge.net                                        *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
+
+======General Information======
+Tuxman is an open source game similar to pacman for Atari but not
+designed to be a clone of it. I consider it to be in the Pre-Alpha
+phase. Please report any bugs you find! :-)
+
+======License======
+This program is under the GPL license. For the details of the license
+read the file called "LICENSE" in this same directory. Changes should
+be sent to malachix@users.sourceforge.net.
+
+======Installation======
+For installation instructions read the INSTALL file.  Ensure
+that you have the below libraries on your system before
+attempting to build or install the application:
+
+* SDL		<http://www.libsdl.org/>
+* SDL_Mixer	<http://www.libsdl.org/projects/SDL_mixer/>
+* libSpiff	<http://libspiff.sourceforge.net/>
+* OpenGL	<http://www.opengl.org/>
+* libjsw	<http://wolfpack.twu.net/libjsw/>
+
+======Expanding======
+For creating levels visit the LEVELS file.
+
+======Layout======
+src - C++ source code for the application
+resources - Holds all files used by the game
+build - Holds build systems/project files
+tools - For the developers
+attic - Deprecated code things that are long forgotten

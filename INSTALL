@@ -1,0 +1,18 @@
+This program can be built and installed in multiple ways.
+Choose the build option below that you are most comfortable with.
+
+Scons:
+If you have the scons build system installed simply navigate to this
+directory and type "scons" in the commandline. Type "scons -c" to
+clean up.
+
+AutoMake:
+If you don't have scons installed but you have make installed, then
+navigate to this directory and type "make". Type "make install" to
+install the program on your system. Type "make clean" to clean up.
+
+Codeblocks:
+If you don't have either of these two programs then open up .cbp
+file in the Codeblocks IDE and compile the program that way.
+You may have to resolve issues by changing the paths to reflect
+where includes and libraries are on your system.

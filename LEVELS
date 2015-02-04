@@ -1,0 +1,27 @@
+Legend:
+The meaning of the characters used to generate maps in the
+".lvl files" are as follows:
+
+b - Blue Wall
+a - Background (if nothing on this tile then dot)
+c - Background (if nothing on this tile then big dot)
+e - Gate
+1 - Blinky
+2 - Pinky
+3 - Inky
+4 - Clyde
+5 - Tuxman
+
+Levels:
+Levels are easy to create. Simply write 29 characters for
+31 lines. The characters must be characters that exist in
+the legend above.  Save that file as LevelNameHere.lvl
+
+Then in another file create metadata to describe your
+levels other attributes like where tuxman should start
+off at. Save this as SameLevelNameHere.meta
+
+Put both of those files into the Resources/level folder.
+
+For ease, you can just use an existing set of level files
+as a template.

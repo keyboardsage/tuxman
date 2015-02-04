@@ -1,0 +1,125 @@
+const int SDL_ERROR = -1;
+const int SDL_SUCCESS = 0;
+-------------------------------------------------------------------------------
+	// loading the bitmap
+	SDL_Surface* surTexture = SDL_LoadBMP("texture.bmp");
+	if (surTexture == NULL) {
+		cout << "Error:  " << SDL_GetError() << endl;
+		return (EXIT_FAILURE);
+	}
+	
+	// converting the bitmap into a texture
+	GLuint glName;
+	glGenTextures(1, &glName);
+	glBindTexture(GL_TEXTURE_2D, glName);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, surTexture->w, surTexture->h, 0, GL_BGR, GL_UNSIGNED_BYTE, surTexture->pixels);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	
+	// deallocate the bitmap surface, OpenGL has it now
+	SDL_FreeSurface(surTexture);
+-------------------------------------------------------------------------------
+/**
+ * Sets up the viewing frustum used for looking into the OpenGL area.
+ * @note basically think of it as a pyramid and your eye is the point, the base is the viewport.
+ * @param fovy The field of view as an angle in terms of the y axis.
+ * @param aspect Ratio of the window's width to height. (How much wider than longer is viewport?)
+ * @param zNear Starting point for how deep we can draw in the OpenGL matrix.
+ * @param zFar Ending point for how deep we can draw in the OpenGL matrix.
+ */
+void gluPerspective(GLdouble fovy, GLdouble aspect, GLdouble zNear, GLdouble zFar)
+{
+    GLdouble xmin, xmax, ymin, ymax;
+
+    ymax = zNear * tan(fovy * M_PI / 360.0);
+    ymin = -ymax;
+    xmin = ymin * aspect;
+    xmax = ymax * aspect;
+
+    glFrustum(xmin, xmax, ymin, ymax, zNear, zFar);
+}
+-------------------------------------------------------------------------------
+/**
+ * Converts the SDL y-coordinate passed into the equivalent OpenGL y-coordinate.
+ */
+int calcSdlToOpengl(int sdlY)
+{
+    return abs(sdlY - (SDL_GetVideoSurface())->h);
+}
+-------------------------------------------------------------------------------
+/**
+ * Pass in the center coordinates you would like to use for positioning a Component/widget
+ * and this function calculate the top left coordinates you need to use in order to make
+ * that happen.
+ * @param x The center coordinate's x.
+ * @param y The center coordinate's y.
+ * @param widthParam Width of the quadrilateral that will be drawn.
+ * @param heightParam Height of the quadrilateral that will be drawn.
+ * @return The Point object containing the upper left coordinates.
+ */
+Point calcCenterToTopLeft(float x, float y, int widthParam, int heightParam)
+{
+    Point temp = { x - (widthParam * 0.5), y + (heightParam * 0.5), 0.0f };
+    return temp;
+}
+-------------------------------------------------------------------------------
+#ifndef _WIN32
+#include <unistd.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <sys/stat.h>
+#endif // _WIN32
+/**
+ * Checks if a file/directory exists and is accessible.
+ * @param filenameParam The filename(including path) to run the algorithm against.
+ * @return True if the file exists and is accessible, otherwise false.
+ */
+bool isAccessible(string filenameParam)
+{
+#ifdef _WIN32
+	// open a filestream using the filepath
+	ifstream theInwardStream(filenameParam);
+
+	// if it can't open then the file is non-existent or we lack privileges
+    if (!theInwardStream.is_open())
+	{
+		throw runtime_error("File is inaccessible. (" + filenameParam + ")");
+	}
+
+	// clean up
+	theInwardStream.close();
+#else
+	// try to get file statistics on unix systems...
+    struct	stat sbuf;
+    if(stat(filenameParam.c_str(), &sbuf) != 0)
+    {
+        filenameParam = "File is inaccessible. (" + filenameParam + ")";
+        throw runtime_error(filenameParam.c_str());
+    }
+#endif
+
+	return true;
+}
+-------------------------------------------------------------------------------
+	string getApplicationPath()
+	{
+		// determine the current working directory
+		char appPath[_MAX_PATH];
+		_getcwd(appPath, _MAX_PATH);
+		return appPath;
+	}
+-------------------------------------------------------------------------------
+// create a window
+	auto_ptr<BasicWindowSDL> theWindowPtr(NULL);
+	try {
+		theWindowPtr.reset(new ComplexWindowSDL("Pacman", "", 800, 640, 16));
+	} catch(const bad_alloc &e) {
+		cerr << MEMERROR_PREFIX << e.what() << endl;
+		abort();
+	} catch(const runtime_error &e) {
+		cerr << RUNERROR_PREFIX << e.what() << endl;
+		abort();
+	} catch(const exception &e) {
+		cerr << ERROR_PREFIX << e.what() << endl;
+		abort();
+	}
+-------------------------------------------------------------------------------

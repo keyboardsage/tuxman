@@ -1,0 +1,49 @@
+		private:
+			typedef std::map<std::string, std::string> ImageFileMap;
+
+		private:
+			ImageFileMap* theImageFilenamesPtr; /**< filename of all image files */
+
+/**
+	 * Maps the filenames of images with keys that symbolize their
+	 * role in the application.
+	 */
+	void GraphicStreamOut::mapResources()
+	{
+		theImageFilenamesPtr = new ImageFileMap();
+	}
+	
+	/**
+	 * Unmaps and cleans up the correlation between symbolic keys
+	 * and filenames.
+	 */
+	void GraphicStreamOut::unmapResources()
+	{
+		delete theImageFilenamesPtr;
+	}
+
+
+/**
+	 * Draws a hero ship.
+	 */
+	void GraphicStreamOut::drawHeroShip() const
+	{
+		// TODO: to save calculation all ships need to be small/medium/large
+
+		// draw the quad that the hero ship will be drawn within
+		// NOTE: the offset from the hero's texture edges to the middle is center
+		glColor3f(1.0, 1.0, 1.0);
+		glBegin(GL_QUADS);
+			glVertex2f(-32.0, 32.0);
+			glVertex2f(32.0, 32.0);
+			glVertex2f(32.0, -32.0);
+			glVertex2f(-32.0, -32.0);
+		glEnd();
+	}
+
+Look into cerces-c for xml parsing/validating
+tolua++ for integration
+cegui for the gui
+guichan for gui
+freeimage
+libunique
