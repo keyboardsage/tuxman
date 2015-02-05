@@ -17,7 +17,6 @@ GameLoop::GameLoop() {
     isDone = false;
     level = NULL;
     fps = NULL;
-    events = NULL;
     tuxman = NULL;
     sealEnemy = NULL;
     sharkEnemy = NULL;
@@ -50,12 +49,13 @@ GameLoop::~GameLoop() {
 void GameLoop::run() {
     setUpLevel();
 
+    SDL_Event event;
     do {
         fps->frameStart();
 
         // handle input and change objects accordingly
-        handleEvents(events);
-        if (delayKeyPressStart != 0 && (SDL_GetTicks() - delayKeyPressStart) >= delayKeyPressInterval) // note: ensures queued event happens under special cases
+        handleEvents();
+        /*if (delayKeyPressStart != 0 && (SDL_GetTicks() - delayKeyPressStart) >= delayKeyPressInterval) // note: ensures queued event happens under special cases
         {
             // DEBUGGING: std::cout << "NOW" << std::endl;SDL_Delay(5000);
             SDL_Event delayedKeyPressEvent;
@@ -63,10 +63,10 @@ void GameLoop::run() {
             delayedKeyPressEvent.key.keysym.sym = static_cast<SDL_Keycode>(delayKeyPressOf);
             SDL_PushEvent(&delayedKeyPressEvent);
             delayKeyPressStart = 0;
-        }
+        }*/
 
         // eat food & calculate new score
-        tuxman->accumScore(eatFood());
+        //tuxman->accumScore(eatFood());
         // DEBUGGING: std::cout << tuxman->getScore() << std::endl;
 
         // use algorithm to move enemies
@@ -74,13 +74,13 @@ void GameLoop::run() {
         // make big dots blink
 
         // render all these changes
-        level->renderLevel();
-        gout << static_cast<ScreenObject*>(tuxman);
+        //level->renderLevel();
+        /*gout << static_cast<ScreenObject*>(tuxman);
         gout << static_cast<ScreenObject*>(sealEnemy);
         gout << static_cast<ScreenObject*>(sharkEnemy);
         gout << static_cast<ScreenObject*>(whaleEnemy);
         gout << static_cast<ScreenObject*>(hawkEnemy);
-        gout.flush();
+        gout.flush();*/
 
         // check for collision
             // reset Tuxman if necessary
@@ -439,21 +439,20 @@ void GameLoop::handleEventsHelper() {
  * Handles events created by the user throughout the game.
  * @param events The SDL_Event structure that hold's the game's latest events
  */
-void GameLoop::handleEvents(SDL_Event* events) {
+void GameLoop::handleEvents() {
     bool anEventHasHappened = false;
 
     // if the first 5 second have not passed then call the handle events helper
-    if (isLevelBeginning)
+    /*if (isLevelBeginning)
     {
         handleEventsHelper();
         return;
-    }
+    }*/
 
-    // otherwise while there are events to process...
-    while(SDL_PollEvent(events))
+    // initiate the particular type of event that goes with that function...
+    while (SDL_PollEvent(&event))
     {
-        // initiate the particular type of event that goes with that function...
-        switch(events->type)
+        switch(event.type)
         {
             case SDL_JOYAXISMOTION:
                 break;
@@ -463,7 +462,7 @@ void GameLoop::handleEvents(SDL_Event* events) {
                 break;
             case SDL_KEYDOWN:
                 if (!anEventHasHappened) anEventHasHappened = true;
-                switch(events->key.keysym.sym) {
+                switch(event.key.keysym.sym) {
                     case SDLK_LEFT:
                         adjustTuxman(SDLK_LEFT);
                         break;
@@ -477,6 +476,13 @@ void GameLoop::handleEvents(SDL_Event* events) {
                         adjustTuxman(SDLK_DOWN);
                         break;
                     default:
+                        break;
+                }
+                break;
+            case SDL_KEYUP:
+                switch(event.key.keysym.sym) {
+                    case SDLK_ESCAPE:
+                        isDone = true;
                         break;
                 }
                 break;
@@ -497,10 +503,9 @@ void GameLoop::handleEvents(SDL_Event* events) {
  */
 void GameLoop::setUpLevel() {
     level = new Level(1);
-    events = new SDL_Event;
 
     fps = new FramesPerSecond();
-    fps->target(35);
+    fps->target(50);
 
     level->buildUpLevel();
 
@@ -541,7 +546,6 @@ void GameLoop::setUpLevel() {
  */
 void GameLoop::tearDownLevel() {
     delete level;
-    delete events;
     delete fps;
     delete tuxman;
     delete sealEnemy;

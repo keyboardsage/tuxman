@@ -20,7 +20,7 @@ class GameLoop {
         bool isfirstXSecondsOfStagePast(unsigned int seconds) const;
         void adjustTuxman(Uint32 currentKeyPressed);
         void handleEventsHelper();
-        void handleEvents(SDL_Event* events);
+        void handleEvents();
         void setUpLevel();
         void tearDownLevel();
         int positionToRow(int position) const;
@@ -33,7 +33,7 @@ class GameLoop {
         bool isDone;
         Level* level;
         FramesPerSecond* fps;
-        SDL_Event* events;
+        SDL_Event event;
         Tuxman* tuxman;
         Enemy* sealEnemy;
         Enemy* sharkEnemy;

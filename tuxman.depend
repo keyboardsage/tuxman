@@ -172,7 +172,7 @@
 1288344831 /home/malachi/Projects/tuxman/src/Enemy.hpp
 	"ScreenObject.hpp"
 
-1423081962 source:/Users/malachi/Projects/tuxman/src/FramesPerSecond.cpp
+1423176953 source:/Users/malachi/Projects/tuxman/src/FramesPerSecond.cpp
 	"FramesPerSecond.hpp"
 	"SDL.h"
 	<iostream>
@@ -510,7 +510,7 @@
 	"begin_code.h"
 	"close_code.h"
 
-1423115553 source:/Users/malachi/Projects/tuxman/src/GameLoop.cpp
+1423177031 source:/Users/malachi/Projects/tuxman/src/GameLoop.cpp
 	"GameLoop.hpp"
 	"GraphicStreamOut.hpp"
 	"DisplayInfo.hpp"
@@ -519,7 +519,7 @@
 	<iostream>
 	<cmath>
 
-1423097046 /Users/malachi/Projects/tuxman/src/GameLoop.hpp
+1423176676 /Users/malachi/Projects/tuxman/src/GameLoop.hpp
 	"SDL.h"
 	"Level.hpp"
 	"FramesPerSecond.hpp"
@@ -578,7 +578,7 @@
 	"DisplayInfo.hpp"
 	"GraphicStreamOut.hpp"
 
-1288366224 source:/Users/malachi/Projects/tuxman/src/Level.cpp
+1423120874 source:/Users/malachi/Projects/tuxman/src/Level.cpp
 	<iostream>
 	<cstdlib>
 	<fstream>

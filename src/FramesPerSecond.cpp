@@ -36,7 +36,8 @@ void FramesPerSecond::target(int targetFpsParam)
  */
 void FramesPerSecond::frameStart()
 {
-    if (frameCountElapsedTime >= 1000) frameCountElapsedTime = 0;
+    //if (frameCountElapsedTime >= 1000)
+    frameCountElapsedTime = 0;
     frameCounter = 0;
     frameStartTime = SDL_GetTicks();
 }
@@ -55,17 +56,13 @@ bool FramesPerSecond::frameEnd()
     // delay if there is extra time left in this frame
     Uint32 elapsedFrameTime = frameEndTime - frameStartTime;
     Uint32 timeToSpare = maxFrameTime - elapsedFrameTime;
-    if (timeToSpare > 0)
+    //std::cout << elapsedFrameTime << std::endl;
+    //std::cout << timeToSpare << std::endl;
+    if (maxFrameTime > elapsedFrameTime && timeToSpare > 0)
     {
         SDL_Delay(timeToSpare);
         isPossible = true;
-    }
-    else if (timeToSpare == 0)
-    {
-        // no waiting necessary, continue
-        isPossible = true;
-    }
-    else isPossible = false;
+    } else isPossible = false;
 
     // increment frame count
     frameCounter++;
