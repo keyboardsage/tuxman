@@ -10,6 +10,9 @@
 #elif linux
 #include <GL/gl.h>
 #include <GL/glut.h>
+#elif __APPLE__
+#include <OpenGL/gl.h>
+//#include <OpenGL/glut.h>
 #endif
 
 #endif

@@ -129,7 +129,7 @@ void Level::setLevel(int intLevelParam) {
     intLevel = intLevelParam;
 
     stringstream ss;
-    ss << "/home/malachi/Projects/tuxman/resources/levels/level" << intLevel << ".lvl";
+    ss << "/Users/malachi/Projects/tuxman/resources/levels/level" << intLevel << ".lvl";
     file = ss.str();
 }
 

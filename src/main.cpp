@@ -3,7 +3,7 @@
 #include <memory>
 using namespace std;
 
-#include <SDL/SDL.h>
+#include "SDL.h"
 #include "OpenGL.hpp"
 
 #include "DisplayInfo.hpp"
@@ -11,9 +11,8 @@ using namespace std;
 
 #include "GameLoop.hpp"
 
-void genDispSurf(DisplayInfo& info);
+SDL_Window* genDispSurf(DisplayInfo& info);
 void setAttr(int bpp, int bitDepth);
-void setupGLArea(DisplayInfo& info);
 
 Configuration config;
 DisplayInfo info;
@@ -50,10 +49,9 @@ config.begin_stage_wait = 1;
 info.width = config.real_tile_width*config.map_width;
 info.height = config.real_tile_height*config.map_height;
 info.depth = config.pixel_depth;
-info.flags = SDL_OPENGL;
-genDispSurf(info);
-SDL_WM_SetCaption("Tuxman", NULL);
-setupGLArea(info);
+info.flags = SDL_WINDOW_OPENGL;
+SDL_Window* mainWindow = genDispSurf(info);
+//SDL_WM_SetCaption("Tuxman", NULL);
 
 // game loop
 GameLoop* gameLoop = new GameLoop();
@@ -67,11 +65,14 @@ return EXIT_SUCCESS;
 }
 
 /**
- * Generates a new SDL display surface (window gets created).
+ * Creates window and creates an OpenGL context.
+ * @todo Port the SDL_VideoModeOK code over SDL2
+ * @return the SDL_Window associated with the game.
  */
-void genDispSurf(DisplayInfo& info)
+SDL_Window* genDispSurf(DisplayInfo& info)
 {
     // first ensure the specifications are plausible for this system
+/*
     int retval = SDL_VideoModeOK(info.width, info.height, info.depth, info.flags);
     if (retval == 0)
     {
@@ -88,47 +89,39 @@ void genDispSurf(DisplayInfo& info)
         cout << "(II) Your system can handle " << info.depth << "-bit color with ease." << endl;
         cout << "(II) Your going to have a ball playing this game!" << endl;
     }
+*/
 
 	// set the attributes for the window we are creating
     int colorBufferSizes = info.depth / 3;
-    setAttr(colorBufferSizes, info.depth);
 
-    // create a display surface, that is our window
-    SDL_SetVideoMode(info.width, info.height, info.depth, info.flags);
-
-    // exit application upon failure
-    if (SDL_GetVideoSurface() == NULL)
-        throw runtime_error(SDL_GetError());
-}
-
-void setAttr(int bpp, int bitDepth)
-{
     // color component buffers
-    SDL_GL_SetAttribute(SDL_GL_RED_SIZE, bpp);
-    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, bpp);
-    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, bpp);
+    SDL_GL_SetAttribute(SDL_GL_RED_SIZE, colorBufferSizes);
+    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, colorBufferSizes);
+    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, colorBufferSizes);
 
     // depth buffer
-    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, bitDepth);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, info.depth);
 
     // always double buffer
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-}
 
-/**
- * Sets up/Reshapes the area inside the window that the OpenGL API manipulates.
- */
-void setupGLArea(DisplayInfo& info)
-{
-    // lets determine the area to manipulate
-    glViewport (0, 0, static_cast<GLsizei>(info.width), static_cast<GLsizei>(info.height));
+    // create a display surface, that is our window
+    //SDL_SetVideoMode(info.width, info.height, info.depth, info.flags);
+    SDL_Window* mainWindow = SDL_CreateWindow("Tuxman",
+                          SDL_WINDOWPOS_UNDEFINED,
+                          SDL_WINDOWPOS_UNDEFINED,
+                          info.width, info.height,
+                          info.flags);
+    SDL_GL_CreateContext(mainWindow);
 
-    // viewing transformation
-    glMatrixMode (GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho(0.0, (GLdouble)info.width, 0.0, (GLdouble)info.height, -1.0, 1.0);
+    // exit application upon failure
+/*
+    if (SDL_GetVideoSurface() == NULL)
+        throw runtime_error(SDL_GetError());
+*/
 
-    // always leave the beginning state in modelview
-    glMatrixMode (GL_MODELVIEW);
-    glLoadIdentity();
+    // initialize graphics rendering object
+    initGraphicsOut(info);
+
+    return mainWindow;
 }

@@ -1,7 +1,7 @@
 #ifndef GAMELOOP_HPP
 #define GAMELOOP_HPP
 
-#include <SDL/SDL.h>
+#include "SDL.h"
 
 #include "Level.hpp"
 #include "FramesPerSecond.hpp"

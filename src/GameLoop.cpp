@@ -2,6 +2,7 @@
 #include "GraphicStreamOut.hpp"
 #include "DisplayInfo.hpp"
 #include "Configuration.hpp"
+#include "ScreenObject.hpp"
 
 #include <iostream>
 #include <cmath>
@@ -59,7 +60,7 @@ void GameLoop::run() {
             // DEBUGGING: std::cout << "NOW" << std::endl;SDL_Delay(5000);
             SDL_Event delayedKeyPressEvent;
             delayedKeyPressEvent.type = SDL_KEYDOWN;
-            delayedKeyPressEvent.key.keysym.sym = static_cast<SDLKey>(delayKeyPressOf);
+            delayedKeyPressEvent.key.keysym.sym = static_cast<SDL_Keycode>(delayKeyPressOf);
             SDL_PushEvent(&delayedKeyPressEvent);
             delayKeyPressStart = 0;
         }
@@ -495,8 +496,6 @@ void GameLoop::handleEvents(SDL_Event* events) {
  * Sets up a level so that it may be played.
  */
 void GameLoop::setUpLevel() {
-    gout.clearScreen();
-
     level = new Level(1);
     events = new SDL_Event;
 
@@ -512,7 +511,7 @@ void GameLoop::setUpLevel() {
     tuxman->setPosition(x, invertY(y));
 
     objInfo.type = '1';
-    objInfo.x = (14 * config.real_tile_width) - (0.5*config.real_tile_width);
+    objInfo.x = (14 * config.real_tile_width) - (0.5 * config.real_tile_width);
     objInfo.y = invertY(11 * config.real_tile_height);
     sealEnemy = new Enemy(objInfo);
 
@@ -522,7 +521,7 @@ void GameLoop::setUpLevel() {
     sharkEnemy = new Enemy(objInfo);
 
     objInfo.type = '3';
-    objInfo.x = (14 * config.real_tile_width) - (0.5*config.real_tile_width);
+    objInfo.x = (14 * config.real_tile_width) - (0.5 * config.real_tile_width);
     objInfo.y = invertY(14 * config.real_tile_height);
     whaleEnemy = new Enemy(objInfo);
 

@@ -13,9 +13,10 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-g" />
+					<Add directory="../../../../Library/Frameworks/SDL2.framework/Versions/A/Headers" />
 				</Compiler>
 				<Linker>
-					<Add option="-lGL -lSDL" />
+					<Add option="-F /Library/Frameworks -framework OpenGL -framework SDL2" />
 				</Linker>
 			</Target>
 			<Target title="Release">
@@ -36,6 +37,8 @@
 		</Compiler>
 		<Unit filename="src/Configuration.hpp" />
 		<Unit filename="src/DisplayInfo.hpp" />
+		<Unit filename="src/Enemy.cpp" />
+		<Unit filename="src/Enemy.hpp" />
 		<Unit filename="src/FramesPerSecond.cpp" />
 		<Unit filename="src/FramesPerSecond.hpp" />
 		<Unit filename="src/GameLoop.cpp" />

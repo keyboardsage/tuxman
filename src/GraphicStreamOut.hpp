@@ -1,13 +1,16 @@
 #ifndef GRAPHICSTREAMOUT_HPP
 #define GRAPHICSTREAMOUT_HPP
 
+#include <iostream>
 #include <string>
 #include <vector>
 #include <map>
+#include <stdexcept>
 
-#include <SDL/SDL.h>
-#include <GL/gl.h>
+#include "SDL.h"
+#include "OpenGL.hpp"
 
+#include "DisplayInfo.hpp"
 #include "NotCopyable.hpp"
 #include "ScreenObject.hpp"
 
@@ -29,7 +32,14 @@
 			void flush() const
 			{
 				glFlush();
-                SDL_GL_SwapBuffers();
+
+				SDL_Window* screen = SDL_GL_GetCurrentWindow();
+                if (screen == NULL)
+                {
+                    std::cerr << "(EE) Unable to execute SDL_GL_GetCurrentWindow()." << std::endl;
+                    throw std::runtime_error(SDL_GetError());
+                }
+                SDL_GL_SwapWindow(screen);
 			}
 
 			void clearScreen() const
@@ -56,8 +66,9 @@
                 glColor3f(red, green, blue);
             }
 
+            void setOpacity(int intAmountParam);
+
 		private:
-			void setOpacity(int intAmountParam);
 			void setFlag();
 			void unsetFlag();
 			void checkDrawError();
@@ -71,14 +82,18 @@
 	// NOTE: ***** Helper functions below *****
 
 	/**
-	 * Sets the opacity of the object that will drawn.
+	 * Sets the opacity of the object that will be drawn.
 	 */
 	template <typename T>
 	GraphicStreamOut& setOpacity(GraphicStreamOut &gstream, int intPercentAmountParam)
 	{
-		// use opengl and
 		gstream.setOpacity(intPercentAmountParam);
 		return gstream;
 	}
+
+	/**
+	 * Sets OpenGL attributes and clears the screen for drawing.
+	 */
+	void initGraphicsOut(DisplayInfo& info);
 
 #endif /*GRAPHICSTREAMOUT_HPP*/

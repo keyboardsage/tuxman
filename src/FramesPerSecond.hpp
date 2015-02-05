@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-#include <SDL/SDL.h>
+#include "SDL.h"
 
 /**
  * A class that keeps track of FPS(Frames Per Second).

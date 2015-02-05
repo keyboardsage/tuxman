@@ -1,6 +1,6 @@
 #include "FramesPerSecond.hpp"
 
-#include <SDL/SDL.h>
+#include "SDL.h"
 
 #include <iostream>
 
