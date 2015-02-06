@@ -24,8 +24,8 @@ try {
     if(SDL_InitSubSystem(SDL_INIT_VIDEO) == -1)
         throw runtime_error(SDL_GetError());
 } catch(runtime_error& e) {
-    cerr << "(E) An error occurred while loading manager." << endl;
-    cerr << "(E) Cause Message: " << e.what() << endl;
+    cerr << "(EE) An error occurred while loading manager." << endl;
+    cerr << "(EE) Cause Message: " << e.what() << endl;
     return EXIT_FAILURE;
 }
 
@@ -51,7 +51,6 @@ info.height = config.real_tile_height*config.map_height;
 info.depth = config.pixel_depth;
 info.flags = SDL_WINDOW_OPENGL;
 SDL_Window* mainWindow = genDispSurf(info);
-//SDL_WM_SetCaption("Tuxman", NULL);
 
 // game loop
 GameLoop* gameLoop = new GameLoop();

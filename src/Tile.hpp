@@ -29,7 +29,7 @@ class Tile: public ScreenObject {
                 glEnd();
 
                 // draw food on top of tile if necessary
-                if (info->type == 'a' && hasFood) {
+                if (hasFood) { // info->type == 'a' &&
                     gout.drawColor(GraphicStreamOut::WHITE);
                     glBegin(GL_QUADS);
                         glVertex2f(0.25 * info->width, 0.25 * -info->height);

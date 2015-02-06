@@ -31,7 +31,7 @@ Level::~Level() {
 void Level::buildUpLevel() {
     ifstream* levelStream = new ifstream(file.c_str());
     if (levelStream->fail()) {
-        cerr << "(E) Could not open level file." << endl;
+        cerr << "(EE) Could not open level file." << endl;
         levelStream->close();
         exit(EXIT_FAILURE);
     } else buildUpLevelHelp(levelStream, 0.0, info.height);

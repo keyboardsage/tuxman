@@ -23,12 +23,9 @@ GameLoop::GameLoop() {
     whaleEnemy = NULL;
     hawkEnemy = NULL;
     navStartTime = 0;
-    originalTuxmanX = 0;
-    originalTuxmanY = 0;
-    lastKeyPressed = SDLK_RETURN; // RETURN key used as flag to let us know stage just started
+    lastDirection = NONE;
     stageBeginTime = 0;
-    isLevelBeginning = true;
-    queuedDesiredDirection = SDLK_LEFT;
+    queuedDesiredDirection = NONE;
     delayKeyPressOf = SDLK_UNKNOWN;
     delayKeyPressStart = 0;
     delayKeyPressInterval = 0;
@@ -74,13 +71,13 @@ void GameLoop::run() {
         // make big dots blink
 
         // render all these changes
-        //level->renderLevel();
-        /*gout << static_cast<ScreenObject*>(tuxman);
-        gout << static_cast<ScreenObject*>(sealEnemy);
+        level->renderLevel();
+        gout << static_cast<ScreenObject*>(tuxman);
+        /*gout << static_cast<ScreenObject*>(sealEnemy);
         gout << static_cast<ScreenObject*>(sharkEnemy);
         gout << static_cast<ScreenObject*>(whaleEnemy);
-        gout << static_cast<ScreenObject*>(hawkEnemy);
-        gout.flush();*/
+        gout << static_cast<ScreenObject*>(hawkEnemy);*/
+        gout.flush();
 
         // check for collision
             // reset Tuxman if necessary
@@ -105,8 +102,8 @@ void GameLoop::run() {
  */
 int GameLoop::eatFood() const {
     // convert OpenGL coord into level file coord
-    int myColumn = (lastKeyPressed != SDLK_LEFT) ? xToColumn(tuxman->getX()) : xToColumn(tuxman->getX() + (0.75 * config.real_tile_width));
-    int myRow = (lastKeyPressed != SDLK_UP) ? yToRow(invertY(tuxman->getY())) : yToRow(invertY(tuxman->getY() - (0.75 * config.real_tile_width)));
+    int myColumn = (lastDirection != LEFT) ? xToColumn(tuxman->getX()) : xToColumn(tuxman->getX() + (0.75 * config.real_tile_width));
+    int myRow = (lastDirection != UP) ? yToRow(invertY(tuxman->getY())) : yToRow(invertY(tuxman->getY() - (0.75 * config.real_tile_width)));
     int myPosition = ((myRow-1) * config.map_width) + myColumn; // note: If your on row 24, then there are 23 full rows before it
 
     // if Tuxman's position currently overlaps a tile's food...
@@ -131,61 +128,54 @@ int GameLoop::eatFood() const {
 }
 
 /**
- * Calculates whether the first X seconds of a level have past.
- * @param seconds the number of seconds to wait
- * @return True if x seconds have past, otherwise false.
- */
-bool GameLoop::isfirstXSecondsOfStagePast(unsigned int seconds) const {
-    Uint32 timeElapsedSinceStageBegin = 0;
-
-    timeElapsedSinceStageBegin = SDL_GetTicks() - stageBeginTime;
-
-    if (timeElapsedSinceStageBegin < (seconds * 1000)) return false;
-
-    return true;
-}
-
-/**
  * Adjusts the Tuxman's current coordinates in response to recent input.
  * @todo This method is to long it should be chopped up.
  * @todo This method needs to be cleaned up(possibly reimplemented), it is terribly hackish and complicated.
  * @todo Teleporting vertically needs to be implemented.
- * @param currentKeyPressed the event requested by the user
+ * @param currentDirection the direction user wants to move tuxman
  */
-void GameLoop::adjustTuxman(Uint32 currentKeyPressed) {
+void GameLoop::adjustTuxman(Direction currentDirection) {
+    static float originalObjectX;
+    static float originalObjectY;
+
+    originalObjectX = tuxman->getX();
+    originalObjectY = tuxman->getY();
+
     // convert OpenGL coord into level file coord
-    int myColumn = xToColumn(tuxman->getX());
-    int myRow = yToRow(invertY(tuxman->getY()));
-    int myPosition = ((myRow-1) * config.map_width) + myColumn; // note: If your on row 24, then there are 23 full rows before it
+    int myColumn = xToColumn(originalObjectX);
+    int myRow = yToRow(invertY(originalObjectY));
+    int myPosition = ((myRow - 1) * config.map_width) + myColumn; // note: If your on row 24, then there are 23 full rows before it
 
     // calculate displacement
     int elapsedTime = SDL_GetTicks() - navStartTime; // in milliseconds
     int averageTileSize = (config.real_tile_width + config.real_tile_height) / 2;
-    float rate = (averageTileSize * 4) / 1000.0; // (4 times average tile size) pixels per 1 second
+    float rate = (averageTileSize * 5) / 1000.0; // (5 times average tile size) pixels per 1 second
     float displacement = rate * elapsedTime;
 
-    // if the lastKeyPressed is the same key desired it is business as usual...
-    if (lastKeyPressed == currentKeyPressed)
-    {
-        // if Tuxman's direction is contrary to desired(queued) direction...
-        if ( (currentKeyPressed == SDLK_UP || currentKeyPressed == SDLK_DOWN) && queuedDesiredDirection != currentKeyPressed ) {
-            // change direction if desired direction is...
+    // if Tuxman's direction is contrary to desired direction...
+    if ( currentDirection != lastDirection ) {
+        lastDirection = currentDirection;
+    }
+
+    /*if ( currentDirection != lastDirection ) {
+        if ( lastDirection == UP || lastDirection == DOWN ) {
+            // queue up the pending direction change...
             if (queuedDesiredDirection == SDLK_LEFT && // left
                 level->tileType(myPosition - 1) != 'b' && // unblocked
-                myRow != yToRow(invertY(displacement + originalTuxmanY))) // Tuxman ready to change direction
+                myRow != yToRow(invertY(displacement + originalObjectY))) // Tuxman ready to change direction
             {
                 tuxman->setY(invertY((myRow-1)*config.real_tile_height));
                 adjustTuxman(SDLK_LEFT);
                 return;
             } else if (queuedDesiredDirection == SDLK_RIGHT &&
                 level->tileType(myPosition + 1) != 'b' &&
-                myRow != yToRow(invertY(displacement + originalTuxmanY)))
+                myRow != yToRow(invertY(displacement + originalObjectY)))
             {
                 tuxman->setY(invertY((myRow-1)*config.real_tile_height));
                 adjustTuxman(SDLK_RIGHT);
                 return;
             }
-        } else if ( (currentKeyPressed == SDLK_LEFT || currentKeyPressed == SDLK_RIGHT) && queuedDesiredDirection != currentKeyPressed ) { // contrary to desired
+        } else if ( currentKeyPressed == SDLK_LEFT || currentKeyPressed == SDLK_RIGHT ) { // contrary to desired
             // change direction if desired direction is...
             if (currentKeyPressed == SDLK_RIGHT && queuedDesiredDirection == SDLK_UP && // up
                 level->tileType(myPosition - config.map_width) != 'b' && // unblocked
@@ -205,114 +195,105 @@ void GameLoop::adjustTuxman(Uint32 currentKeyPressed) {
 
             if (currentKeyPressed == SDLK_LEFT && queuedDesiredDirection == SDLK_UP && // up
                 level->tileType(myPosition - config.map_width) != 'b' && // unblocked
-                myColumn != xToColumn(originalTuxmanX - displacement)) // Tuxman ready to change direction
+                myColumn != xToColumn(originalObjectX - displacement)) // Tuxman ready to change direction
             {
                 tuxman->setX(myColumn*config.real_tile_width);
                 adjustTuxman(SDLK_UP);
                 return;
             } else if (currentKeyPressed == SDLK_LEFT && queuedDesiredDirection == SDLK_DOWN &&
                 level->tileType(myPosition + config.map_width) != 'b' &&
-                myColumn != xToColumn(originalTuxmanX - displacement))
+                myColumn != xToColumn(originalObjectX - displacement))
             {
                 tuxman->setX(myColumn*config.real_tile_width);
                 adjustTuxman(SDLK_DOWN);
                 return;
             }
         }
+    }
+    */
 
+    // if the same direction is still desired then simply adjust...
+    if (currentDirection == lastDirection)
+    {
+        //DEBUGGING: std::cout << myPosition << "    " << blockingTilePosition << std::endl;
         // move Tuxman around
         int blockingTilePosition;
         char blockingTileType;
-        //DEBUGGING: std::cout << myPosition << "    " << blockingTilePosition << std::endl;
         int blockingTileCloseCoord;
-        bool nextMoveWouldPastBlockingTile;
-        switch (lastKeyPressed) {
-            case SDLK_LEFT:
-                // find the next tile in this direction Tuxman can't cross (start with adjacent tile, assume Tuxman always on valid tile)
-                for (int i = myPosition - 1; blockingTileType != 'b' ; i--) {
-                    blockingTilePosition = i;
-                    blockingTileType = level->tileType(blockingTilePosition);
-                }
+        bool isInvalidMove;
+        switch (lastDirection) {
+            case LEFT:
+                // find the next tile blocking in this direction
+                firstBlockingTile(lastDirection, myPosition, blockingTilePosition, blockingTileType, blockingTileCloseCoord);
 
                 // if the blocking tile is not on this line then we must be teleporting from left to right
-                if (blockingTilePosition <= myPosition - ((myPosition % config.map_width)+1)) {
+                /*if (blockingTilePosition <= myPosition - ((myPosition % config.map_width) + 1)) {
                     // keep moving to edge of screen until close enough to edge for teleport
                     if (tuxman->getX() > (config.real_tile_width / 5.5)) {
-                        tuxman->setX(originalTuxmanX - displacement);
+                        tuxman->setX(originalObjectX - displacement);
                     } else {
                         navStartTime = SDL_GetTicks();
-                        originalTuxmanX = (config.map_width-1)*config.real_tile_width;
-                        tuxman->setX(originalTuxmanX);
+                        originalObjectX = (config.map_width - 1) * config.real_tile_width;
+                        tuxman->setX(originalObjectX);
                     }
                     break;
-                }
+                }*/
 
-                // adjust Tuxman coordinates (keep going in direction as along as adjacent tile is non-blocking)
-                blockingTileCloseCoord = ((blockingTilePosition % config.map_width)*config.real_tile_width) + config.real_tile_width;
-                nextMoveWouldPastBlockingTile = (originalTuxmanX - displacement) <= blockingTileCloseCoord;
-                if (!nextMoveWouldPastBlockingTile) {
-                    tuxman->setX(originalTuxmanX - displacement);
+                // keep going in direction as long as adjacent tile is non-blocking
+                std::cout << originalObjectX << std::endl;
+                isInvalidMove = (originalObjectX - displacement) <= blockingTileCloseCoord;
+                if (!isInvalidMove) {
+                    tuxman->setX(originalObjectX - displacement);
                 } else {
                     tuxman->setX(blockingTileCloseCoord);
                 }
                 break;
-            case SDLK_RIGHT:
-                // find the next tile in this direction Tuxman can't cross
-                for (int i = myPosition+1; blockingTileType != 'b' ; i++) {
-                    blockingTilePosition = i;
-                    blockingTileType = level->tileType(blockingTilePosition);
-                }
+            case RIGHT:
+                // find the next tile blocking in this direction
+                firstBlockingTile(lastDirection, myPosition, blockingTilePosition, blockingTileType, blockingTileCloseCoord);
 
                 // if the blocking tile is not on this line then we must be teleporting from right to left
-                if (blockingTilePosition >= (myPosition + (config.map_width - ((myPosition % config.map_width))))) {
+                /*if (blockingTilePosition >= (myPosition + (config.map_width - ((myPosition % config.map_width))))) {
                     // keep moving to edge of screen until close enough to edge for teleport
-                    if (tuxman->getX() < (((config.map_width-1)*config.real_tile_width) - config.real_tile_width + (config.real_tile_width - (config.real_tile_width / 5.5)))) {
-                        tuxman->setX(originalTuxmanX + displacement);
+                    if (tuxman->getX() < (((config.map_width - 1) * config.real_tile_width) - config.real_tile_width + (config.real_tile_width - (config.real_tile_width / 5.5)))) {
+                        tuxman->setX(originalObjectX + displacement);
                     } else {
                         navStartTime = SDL_GetTicks();
-                        originalTuxmanX = 0;
-                        tuxman->setX(originalTuxmanX);
+                        originalObjectX = 0;
+                        tuxman->setX(originalObjectX);
                     }
                     break;
-                }
+                }*/
 
-                // adjust Tuxman coordinates (keep going in direction as along as adjacent tile is non-blocking)
-                blockingTileCloseCoord = ((blockingTilePosition % config.map_width)*config.real_tile_width);
-                nextMoveWouldPastBlockingTile = (originalTuxmanX + displacement + config.real_tile_width) >= blockingTileCloseCoord;
-                if (!nextMoveWouldPastBlockingTile) {
-                    tuxman->setX(originalTuxmanX + displacement);
+                // keep going in direction as along as adjacent tile is non-blocking
+                isInvalidMove = (originalObjectX + displacement + config.real_tile_width) >= blockingTileCloseCoord;
+                if (!isInvalidMove) {
+                    tuxman->setX(originalObjectX + displacement);
                 } else {
                     tuxman->setX(blockingTileCloseCoord - config.real_tile_width);
                 }
                 break;
-            case SDLK_UP:
-                // find the next tile in this direction Tuxman can't cross
-                for (int i = myPosition; blockingTileType != 'b' ; i -= config.map_width) {
-                    blockingTilePosition = i;
-                    blockingTileType = level->tileType(blockingTilePosition);
-                }
+            case UP:
+                // find the next tile blocking in this direction
+                firstBlockingTile(lastDirection, myPosition, blockingTilePosition, blockingTileType, blockingTileCloseCoord);
 
                 // adjust Tuxman coordinates (keep going in direction as along as adjacent tile is non-blocking)
-                blockingTileCloseCoord = invertY(((blockingTilePosition / config.map_width)*config.real_tile_height) + config.real_tile_height); // opengl coord
-                nextMoveWouldPastBlockingTile = (originalTuxmanY + displacement) >= blockingTileCloseCoord;
-                if (!nextMoveWouldPastBlockingTile) {
-                    tuxman->setY(originalTuxmanY + displacement);
+                std::cout << originalObjectY << " " << blockingTileCloseCoord << " " << displacement << " " << blockingTilePosition << std::endl;
+                isInvalidMove = (originalObjectY + displacement) >= blockingTileCloseCoord;
+                if (!isInvalidMove) {
+                    tuxman->setY(originalObjectY + displacement);
                 } else {
                     tuxman->setY(blockingTileCloseCoord);
                 }
                 break;
-            case SDLK_DOWN:
-                // find the next tile in this direction Tuxman can't cross
-                for (int i = myPosition; blockingTileType != 'b' ; i += config.map_width) {
-                    blockingTilePosition = i;
-                    blockingTileType = level->tileType(blockingTilePosition);
-                }
+            case DOWN:
+                // find the next tile blocking in this direction
+                firstBlockingTile(lastDirection, myPosition, blockingTilePosition, blockingTileType, blockingTileCloseCoord);
 
                 // adjust Tuxman coordinates (keep going in direction as along as adjacent tile is non-blocking)
-                blockingTileCloseCoord = invertY(((blockingTilePosition / config.map_width)*config.real_tile_height)); // opengl coord
-                nextMoveWouldPastBlockingTile = (originalTuxmanY - displacement - config.real_tile_height) <= blockingTileCloseCoord;
-                if (!nextMoveWouldPastBlockingTile) {
-                    tuxman->setY(originalTuxmanY - displacement);
+                isInvalidMove = (originalObjectY - displacement - config.real_tile_height) <= blockingTileCloseCoord;
+                if (!isInvalidMove) {
+                    tuxman->setY(originalObjectY - displacement);
                 } else {
                     tuxman->setY(blockingTileCloseCoord + config.real_tile_height);
                 }
@@ -320,7 +301,7 @@ void GameLoop::adjustTuxman(Uint32 currentKeyPressed) {
             default:
                 break;
         }
-    } else { // otherwise...the user wants to change direction...
+    } /*else { // otherwise...the user wants to change direction...
         // If direction is just the reverse of current direction then allow it
         if ((lastKeyPressed == SDLK_UP && currentKeyPressed == SDLK_DOWN) ||
             (lastKeyPressed == SDLK_DOWN && currentKeyPressed == SDLK_UP) ||
@@ -329,8 +310,8 @@ void GameLoop::adjustTuxman(Uint32 currentKeyPressed) {
         {
             lastKeyPressed = currentKeyPressed;
             navStartTime = SDL_GetTicks();
-            originalTuxmanX = tuxman->getX();
-            originalTuxmanY = tuxman->getY();
+            originalObjectX = tuxman->getX();
+            originalObjectY = tuxman->getY();
         }
 
         // Special cases where Tuxman presses button but should not change direction because Tuxman pressed the button to late
@@ -381,14 +362,14 @@ void GameLoop::adjustTuxman(Uint32 currentKeyPressed) {
                     // if so then change direction to left
                     lastKeyPressed = currentKeyPressed;
                     navStartTime = SDL_GetTicks();
-                    originalTuxmanX = tuxman->getX();
-                    originalTuxmanY = tuxman->getY();
+                    originalObjectX = tuxman->getX();
+                    originalObjectY = tuxman->getY();
                 } else if (level->tileType(myPosition + 1) != 'b' && currentKeyPressed == SDLK_RIGHT) {
                     // right
                     lastKeyPressed = currentKeyPressed;
                     navStartTime = SDL_GetTicks();
-                    originalTuxmanX = tuxman->getX();
-                    originalTuxmanY = tuxman->getY();
+                    originalObjectX = tuxman->getX();
+                    originalObjectY = tuxman->getY();
                 }
             }
         }
@@ -401,14 +382,14 @@ void GameLoop::adjustTuxman(Uint32 currentKeyPressed) {
                     // if so then change direction to up
                     lastKeyPressed = currentKeyPressed;
                     navStartTime = SDL_GetTicks();
-                    originalTuxmanX = tuxman->getX();
-                    originalTuxmanY = tuxman->getY();
+                    originalObjectX = tuxman->getX();
+                    originalObjectY = tuxman->getY();
                 } else if (level->tileType(myPosition + config.map_width) != 'b' && currentKeyPressed == SDLK_DOWN) {
                     // down
                     lastKeyPressed = currentKeyPressed;
                     navStartTime = SDL_GetTicks();
-                    originalTuxmanX = tuxman->getX();
-                    originalTuxmanY = tuxman->getY();
+                    originalObjectX = tuxman->getX();
+                    originalObjectY = tuxman->getY();
                 }
             }
         }
@@ -416,22 +397,48 @@ void GameLoop::adjustTuxman(Uint32 currentKeyPressed) {
         // the requested direction was invalid due to a blocking tile, but remember it
         // ( we will change direction when that direction becomes unblocked )
         if (queuedDesiredDirection != currentKeyPressed) queuedDesiredDirection = currentKeyPressed;
-    }
+    }*/
 }
 
 /**
- * Handles events created by the user at the beginning of the level.
- * @note this method should be called within the first couple seconds of stage
- * starting, it triggers movement.
+ * Finds first blocking tile in the given direction. Populates arguments with information about the blocking tile.
+ * @note function starts with adjacent tile and makes assumption that it begins on coordinate of valid tile
+ * @param theDirection The direction to look in
+ * @param myPosition Tile number used to describe object's current location
+ * @param blockingTilePosition Overwrites argument with tile number used to describe blocking tile's location
+ * @param blockingTileType Overwrites argument with tile type that would block
+ * @param blockingTileCloseCoord Overwrites argument with closest pixel in that direction that would block movement
  */
-void GameLoop::handleEventsHelper() {
-    // if stage just begun then wait before allowing tuxman to move
-    if (lastKeyPressed == SDLK_RETURN && isfirstXSecondsOfStagePast(config.begin_stage_wait)) {
-        lastKeyPressed = SDLK_LEFT;
-        navStartTime = SDL_GetTicks();
-        originalTuxmanX = tuxman->getX();
-        originalTuxmanY = tuxman->getY();
-        isLevelBeginning = false; // don't visit this method anymore
+void GameLoop::firstBlockingTile(Direction theDirection, int myPosition, int& blockingTilePosition, char& blockingTileType, int& blockingTileCloseCoord) const {
+    switch (theDirection) {
+        case LEFT:
+            for (int i = myPosition - 1; blockingTileType != 'b' ; i--) {
+                blockingTilePosition = i;
+                blockingTileType = level->tileType(blockingTilePosition);
+            }
+            blockingTileCloseCoord = ((blockingTilePosition % config.map_width) * config.real_tile_width) + config.real_tile_width;
+            break;
+        case RIGHT:
+            for (int i = myPosition + 1; blockingTileType != 'b' ; i++) {
+                blockingTilePosition = i;
+                blockingTileType = level->tileType(blockingTilePosition);
+            }
+            blockingTileCloseCoord = ((blockingTilePosition % config.map_width) * config.real_tile_width);
+            break;
+        case UP:
+            for (int i = myPosition; blockingTileType != 'b' ; i -= config.map_width) {
+                blockingTilePosition = i;
+                blockingTileType = level->tileType(blockingTilePosition);
+            }
+            blockingTileCloseCoord = invertY(((blockingTilePosition / config.map_width) * config.real_tile_height) + config.real_tile_height);
+            break;
+        case DOWN:
+            for (int i = myPosition; blockingTileType != 'b' ; i += config.map_width) {
+                blockingTilePosition = i;
+                blockingTileType = level->tileType(blockingTilePosition);
+            }
+            blockingTileCloseCoord = invertY(((blockingTilePosition / config.map_width) * config.real_tile_height));
+            break;
     }
 }
 
@@ -440,16 +447,18 @@ void GameLoop::handleEventsHelper() {
  * @param events The SDL_Event structure that hold's the game's latest events
  */
 void GameLoop::handleEvents() {
-    bool anEventHasHappened = false;
+    // delete soon bool anEventHasHappened = false;
 
     // if the first 5 second have not passed then call the handle events helper
+    // TODO: remove this after movement works
     /*if (isLevelBeginning)
     {
         handleEventsHelper();
         return;
     }*/
 
-    // initiate the particular type of event that goes with that function...
+    // handle event based on event type
+    Direction currentDirection = lastDirection;
     while (SDL_PollEvent(&event))
     {
         switch(event.type)
@@ -461,19 +470,18 @@ void GameLoop::handleEvents() {
             case SDL_JOYBUTTONUP:
                 break;
             case SDL_KEYDOWN:
-                if (!anEventHasHappened) anEventHasHappened = true;
                 switch(event.key.keysym.sym) {
                     case SDLK_LEFT:
-                        adjustTuxman(SDLK_LEFT);
+                        currentDirection = LEFT;
                         break;
                     case SDLK_RIGHT:
-                        adjustTuxman(SDLK_RIGHT);
+                        currentDirection = RIGHT;
                         break;
                     case SDLK_UP:
-                        adjustTuxman(SDLK_UP);
+                        currentDirection = UP;
                         break;
                     case SDLK_DOWN:
-                        adjustTuxman(SDLK_DOWN);
+                        currentDirection = DOWN;
                         break;
                     default:
                         break;
@@ -495,7 +503,8 @@ void GameLoop::handleEvents() {
     }
 
     // if no event happened at all then adjust tuxman using last known event
-    if (anEventHasHappened == false) adjustTuxman(lastKeyPressed);
+    adjustTuxman(currentDirection);
+    navStartTime = SDL_GetTicks();
 }
 
 /**
@@ -537,8 +546,12 @@ void GameLoop::setUpLevel() {
 
     gout.flush();
 
+
+
+    // seems like a good place to do intro related things
+    // TODO: block and play music, after music finishes continue onward
     stageBeginTime = SDL_GetTicks();
-    isLevelBeginning = true;
+    navStartTime = SDL_GetTicks();
 }
 
 /**
