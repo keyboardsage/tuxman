@@ -11,6 +11,8 @@
 class FramesPerSecond
 {
     public:
+        static const float SECOND;
+
         FramesPerSecond();
         ~FramesPerSecond();
 
@@ -26,7 +28,7 @@ class FramesPerSecond
     private:
         int targetFps; /**< the target frames per second */
         Uint32 maxFrameTime; /**< max time game can spend on a single frame */
-        bool isPossible; /**< true if was possible to manip frame under maxFrameTime */
+        bool isPossible; /**< true if was possible to manipulate frame under maxFrameTime */
         Uint32 frameStartTime; /**< saves time when frame activity was started */
         Uint32 frameEndTime; /**< saves time when frame activity was ended */
         Uint32 frameCountElapsedTime; /**< time elapsed since frame count last updated */

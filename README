@@ -48,3 +48,7 @@ resources - Holds all files used by the game
 build - Holds build systems/project files
 tools - For the developers
 attic - Deprecated code things that are long forgotten
+
+======Known Issues======
+- FPS is slightly higher than target FPS
+- FPS not accurately reporting when target FPS is to high

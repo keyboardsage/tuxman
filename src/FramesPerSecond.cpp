@@ -4,6 +4,8 @@
 
 #include <iostream>
 
+const float FramesPerSecond::SECOND = 1000.0;
+
 FramesPerSecond::FramesPerSecond()
 {
     // setting up default values
@@ -28,7 +30,7 @@ FramesPerSecond::~FramesPerSecond()
 void FramesPerSecond::target(int targetFpsParam)
 {
     targetFps = targetFpsParam;
-    maxFrameTime = 1000/targetFps;
+    maxFrameTime = FramesPerSecond::SECOND / targetFps;
 }
 
 /**
@@ -36,10 +38,12 @@ void FramesPerSecond::target(int targetFpsParam)
  */
 void FramesPerSecond::frameStart()
 {
-    //if (frameCountElapsedTime >= 1000)
-    frameCountElapsedTime = 0;
+    // for time-keeping purposes on this iteration
     frameCounter = 0;
     frameStartTime = SDL_GetTicks();
+
+    // for time-keeping purposes so we can print FPS on a trigger
+    if (frameCountElapsedTime >= FramesPerSecond::SECOND) frameCountElapsedTime = 0;
 }
 
 /**
@@ -56,19 +60,20 @@ bool FramesPerSecond::frameEnd()
     // delay if there is extra time left in this frame
     Uint32 elapsedFrameTime = frameEndTime - frameStartTime;
     Uint32 timeToSpare = maxFrameTime - elapsedFrameTime;
-    //std::cout << elapsedFrameTime << std::endl;
-    //std::cout << timeToSpare << std::endl;
-    if (maxFrameTime > elapsedFrameTime && timeToSpare > 0)
+    if (maxFrameTime > elapsedFrameTime)
     {
         SDL_Delay(timeToSpare);
         isPossible = true;
-    } else isPossible = false;
+    } else isPossible = false; // What about when equal? you are pushing the limits of your system, consider it a failure
 
-    // increment frame count
+    // increment frame count for the current second
     frameCounter++;
 
+    // status message
+    //std::cout << "(II) Rendering frame took " << (elapsedFrameTime + timeToSpare) << " ms" << std::endl;
+
     // flag used to update frame count once per second
-    frameCountElapsedTime += (elapsedFrameTime + timeToSpare);
+    frameCountElapsedTime += elapsedFrameTime + timeToSpare;
 
     return isPossible;
 }
@@ -80,7 +85,7 @@ bool FramesPerSecond::frameEnd()
  */
 void FramesPerSecond::updateFrameCount()
 {
-    if (frameCountElapsedTime >= 1000) frameCount = static_cast<float>(frameCountElapsedTime) / static_cast<float>(maxFrameTime);
+    if (frameCountElapsedTime >= FramesPerSecond::SECOND) frameCount = static_cast<float>(frameCountElapsedTime) / static_cast<float>(maxFrameTime);
 }
 
 /**
@@ -88,7 +93,7 @@ void FramesPerSecond::updateFrameCount()
  */
 void FramesPerSecond::printStatus()
 {
-    if (frameCountElapsedTime >= 1000) std::cout << "(II) " << frameCount << " fps" << std::endl;
+    if (frameCountElapsedTime >= FramesPerSecond::SECOND) std::cout << "(II) " << frameCount << " fps" << std::endl;
 }
 
 /**

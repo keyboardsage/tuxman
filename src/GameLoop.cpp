@@ -505,7 +505,7 @@ void GameLoop::setUpLevel() {
     level = new Level(1);
 
     fps = new FramesPerSecond();
-    fps->target(50);
+    fps->target(60);
 
     level->buildUpLevel();
 
